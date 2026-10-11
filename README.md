@@ -1,25 +1,16 @@
 # Projeto Integrador - Arremate (Polo Têxtil do Agreste)  
+Equipe: **Arremate**
 
 Sistema de gestão voltado para o apoio operacional de microempresas e oficinas de costura (facções) do Polo de Confecções do Agreste Pernambucano. Desenvolvido como Projeto Integrador do 2º período do curso de Análise e Desenvolvimento de Sistemas do SENAC.
+
 
 ## 🚀 Tecnologias Utilizadas
 
 * **Backend:** Python com Flask
-* **Banco de Dados:** SQLite (desenvolvimento) / PostgreSQL (produção)
+* **Banco de Dados:** SQLite (desenvolvimento/testes) banco padrão / PostgreSQL (produção) opcional na nuvem.
 * **Frontend:** HTML5, CSS3 e JavaScript
 * **Controle de Versão:** Git e GitHub
 
-# Arremate
-
-Sistema interno para oficina de costura. Projeto/equipe: **Arremate**.
-
-- HTML com as telas e os formulários escritos no `index.html`.
-- CSS separado para o visual.
-- JavaScript puro para eventos, preenchimento dos dados e chamadas à API.
-- Python sem framework no backend.
-- SQLite local por padrão; PostgreSQL opcional na nuvem.
-
-Não precisa de React, Node, npm ou compilação para rodar.
 
 ## Rodar pela primeira vez
 
@@ -35,35 +26,6 @@ O primeiro comando cria as tabelas e pede nome, login e senha da gerente. Ao dig
 Abra **http://localhost:8000**. No Windows, se `python` não funcionar, use `py`. No Linux/macOS, use `python3`.
 
 Não abra `index.html` com duplo clique ou Live Server para usar o sistema: os dados e o login dependem do Python. Nenhuma dependência precisa ser instalada para SQLite.
-
-O banco novo fica em `data/arremate.db`. Não existe login ou senha padrão.
-
-## Atualizar uma instalação que já tem dados
-
-O ZIP não contém seus dados reais. Para reaproveitar o banco SQLite da versão anterior:
-
-1. No terminal **da versão anterior**, faça um backup consistente: 
-
-```powershell
-python app.py backup --output backup-arremate.db
-```
-
-2. Pare o servidor antigo com Ctrl+C.
-3. Extraia esta versão em uma **pasta nova**.
-4. Na nova pasta `arremate`, crie `data` e copie `backup-arremate.db` para `data/arremate.db`.
-5. Execute `python app.py init` e `python app.py` na pasta nova.
-
-O esquema SQLite continua compatível: os lotes, funcionários, senhas e ocorrências são preservados. O comando `init` não substitui a gerente existente. Será preciso entrar novamente porque o cookie de sessão mudou de nome.
-
-Se seu `.env` tinha `SQLITE_PATH`, ajuste o caminho para a cópia do banco que deseja usar. Mantenha o backup e a pasta anterior até conferir os dados. Não copie apenas um arquivo de banco em uso: use o comando de backup para incluir os dados do WAL.
-
-PostgreSQL usa agora o schema `arremate`. Se já possui dados em outro schema, faça backup e renomeie esse schema para `arremate` em vez de inicializar um banco vazio. No SQL Editor, com o nome real do schema anterior:
-
-```sql
-ALTER SCHEMA NOME_DO_SCHEMA_ANTERIOR RENAME TO arremate;
-```
-
-Não execute isso se o schema de destino já existir; primeiro confira qual contém seus dados. O novo ZIP não transfere ou mescla bancos automaticamente.
 
 ## Regras do sistema
 
@@ -83,7 +45,7 @@ Não execute isso se o schema de destino já existir; primeiro confira qual cont
 
 **Resultados:** total confeccionado considera lotes encerrados. Valores previstos consideram as peças restantes × valor por peça. Esta versão não registra pagamentos ou baixas financeiras.
 
-## Onde mexer em cada coisa
+## Arquivos principais e suas funções
 
 | Arquivo | O que contém |
 | --- | --- |
@@ -102,28 +64,7 @@ Exemplo: o `form-finalizar` existe no HTML. No JavaScript, seu evento `submit` l
 
 Os `<template>` no fim do HTML são modelos de partes repetidas: cartão de lote, linha de funcionário, etapa e observação. O JavaScript usa `cloneNode` para copiá-los e `textContent` para preencher. Não existem telas inteiras em strings nem uso de `innerHTML` para gerar formulários. Isso também evita interpretar nomes e observações como código HTML.
 
-## GitHub e colaboradores
-
-Clonar o GitHub baixa o código, não dá acesso automático aos dados.
-
-- Funcionários precisam apenas da URL do sistema, login e senha.
-- Desenvolvedores podem executar localmente e ter seu SQLite individual.
-- Para trabalhar com os mesmos dados remotamente, configure um PostgreSQL de testes compartilhado.
-
 O `.gitignore` exclui `.env`, banco, backups e arquivos temporários. Não envie credenciais ou banco real ao GitHub.
-
-Em um repositório novo:
-
-```powershell
-git init
-git add .
-git commit -m "Sistema Arremate"
-git branch -M main
-git remote add origin https://github.com/SEU_USUARIO/SEU_REPOSITORIO.git
-git push -u origin main
-```
-
-Se já clonou um repositório, use `git add`, `git commit` e `git push` normalmente.
 
 ## Usar na rede da oficina
 
@@ -133,19 +74,7 @@ Para testar, rode no computador que ficará como servidor:
 python app.py --host 0.0.0.0 --port 8000
 ```
 
-Use `ipconfig` para encontrar o IPv4. Em outro aparelho da mesma rede, abra, por exemplo, `http://192.168.1.50:8000`, trocando pelo IP real. O computador central precisa ficar ligado. Se necessário, permita a porta 8000 no perfil privado do Firewall do Windows.
-
-O arquivo SQLite fica junto do Python, no computador servidor. Todos os usuários passam pela API; não abra o banco diretamente em várias máquinas nem coloque o banco em pasta de rede/OneDrive para compartilhá-lo.
-
-O servidor de `python app.py` é de desenvolvimento. Para uso contínuo com vários usuários, instale Waitress (servidor WSGI, não framework):
-
-```powershell
-python -m venv .venv
-.\.venv\Scripts\python.exe -m pip install "waitress>=3.0.2,<4"
-.\.venv\Scripts\waitress-serve.exe --listen=0.0.0.0:8000 app:application
-```
-
-Para internet, use hospedagem Python com HTTPS. GitHub Pages não executa o backend. Em hospedagem com SQLite, o disco deve ser persistente. Não use o servidor de desenvolvimento como servidor público.
+Use `ipconfig` para encontrar o IPv4 do servidor. Em outro aparelho certifique-se de está na mesma rede do servidor, abra por exemplo, `http://192.168.X.XX:8000`, trocando os X.XX pelo IP real do servidor. O servidor precisa ficar ligado. Se necessário, permita a porta 8000 no perfil privado do Firewall do Windows.
 
 ## PostgreSQL/Supabase opcional
 
@@ -178,9 +107,9 @@ Use host, porta e usuário fornecidos pelo painel. O formato acima é apenas um 
 .\.venv\Scripts\python.exe app.py
 ```
 
-As tabelas serão criadas no schema privado `arremate`. Não exponha esse schema na Data API. O navegador nunca recebe `DATABASE_URL`; ela fica no backend. Compartilhe somente a URL de um banco de testes com desenvolvedores autorizados, por um canal privado.
+As tabelas serão criadas no schema privado `arremate`.
 
-Trocar SQLite por PostgreSQL não copia os dados automaticamente. Esta entrega foi testada com SQLite; a conexão com sua conta Supabase precisa ser configurada e conferida por você. Consulte limites atuais do plano em https://supabase.com/pricing.
+Trocar SQLite por PostgreSQL não copia os dados automaticamente.
 
 Para hospedagem HTTPS, configure `COOKIE_SECURE=1`, instale `requirements-cloud.txt` e use `waitress-serve --listen=0.0.0.0:8000 app:application`, ajustando a porta conforme o serviço.
 
