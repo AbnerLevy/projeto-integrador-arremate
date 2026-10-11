@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#168166">
+  <title>Arremate · Gestão de produção</title>
+  <link rel="icon" href="/favicon.svg">
+  <link rel="stylesheet" href="/style.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <!-- As telas e os formulários estão no HTML. O JS só preenche e alterna as telas. -->
+  <p id="carregando" class="carregando">Carregando o Arremate…</p>
+
+  <section id="tela-login" class="tela-login" hidden>
+    <div class="cartao-login">
+      <div class="marca"><img src="/favicon.svg" alt="">Arremate<span>.</span></div>
+      <p class="legenda">GESTÃO DA OFICINA</p>
+      <h1>Acesse sua produção</h1>
+      <p>Entre com o login e a senha fornecidos pela gerente.</p>
+      <form id="form-login">
+        <label>Login <input name="username" required maxlength="40" autocomplete="username"></label>
+        <label>Senha <input name="password" type="password" required maxlength="128" autocomplete="current-password"></label>
+        <button type="submit">Entrar</button>
+      </form>
+      <small>Gerente e equipe usam esta mesma tela de acesso.</small>
+    </div>
+  </section>
+
+  <section id="erro-conexao" class="tela-login" hidden>
+    <div class="cartao-login">
+      <h1>Não foi possível conectar</h1>
+      <p>Confira se o servidor Python está funcionando.</p>
+      <button id="tentar-novamente" type="button">Tentar novamente</button>
+    </div>
+  </section>
+
+  <div id="sistema" hidden>
+    <header class="cabecalho">
+      <a href="/" class="marca"><img src="/favicon.svg" alt="">Arremate<span>.</span></a>
+      <nav aria-label="Menu principal">
+        <button id="menu-lotes" type="button" class="menu ativo">Lotes</button>
+        <button id="menu-equipe" type="button" class="menu somente-gerente" hidden>Equipe</button>
+        <button id="menu-cadastros" type="button" class="menu somente-gerente" hidden>Etapas e produtos</button>
+        <button id="menu-resultados" type="button" class="menu somente-gerente" hidden>Resultados</button>
+      </nav>
+      <div class="conta">
+        <div><strong id="nome-usuario"></strong><small id="funcao-usuario"></small></div>
+        <button id="abrir-avisos" type="button" class="secundario">Avisos <span id="numero-avisos"></span></button>
+        <button id="sair" type="button" class="botao-texto">Sair</button>
+      </div>
+    </header>
+
+    <main>
+      <p id="tipo-painel" class="legenda"></p>
+      <p id="atualizacao" class="atualizacao" role="status"></p>
+
+      <!-- Tela de lotes: a gerente vê todos; o funcionário só os que são dele. -->
+      <section id="tela-lotes">
+        <div class="titulo-pagina">
+          <div><h1 id="titulo-lotes">Produção</h1><p id="descricao-lotes">Crie os lotes e acompanhe cada etapa.</p></div>
+          <button id="novo-lote" type="button" class="somente-gerente" hidden>+ Novo lote</button>
+        </div>
+        <div class="barra-busca">
+          <label>Buscar lote <input id="busca-lotes" type="search" placeholder="Código, produto ou cor"></label>
+          <label>Mostrar
+            <select id="filtro-lotes">
+              <option value="todos">Todos</option>
+              <option value="minha-vez">Minha vez</option>
+              <option value="producao">Em produção</option>
+              <option value="concluidos">Concluídos</option>
+            </select>
+          </label>
+        </div>
+        <div id="lista-lotes" class="grade-lotes"></div>
+        <p id="sem-lotes" class="vazio" hidden>Nenhum lote encontrado.</p>
+      </section>
+
+      <!-- Cadastro e controle de acesso da equipe. -->
+      <section id="tela-equipe" hidden>
+        <div class="titulo-pagina">
+          <div><h1>Equipe</h1><p>Cadastre os funcionários e libere o acesso.</p></div>
+          <button id="novo-funcionario" type="button">+ Novo funcionário</button>
+        </div>
+        <div id="lista-equipe" class="painel lista"></div>
+        <p id="sem-equipe" class="vazio" hidden>Nenhum funcionário cadastrado.</p>
+      </section>
+
+      <!-- Catálogos abertos a novos produtos, setores e etapas. -->
+      <section id="tela-cadastros" hidden>
+        <div class="titulo-pagina"><div><h1>Etapas e produtos</h1><p>Cadastre o que sua oficina precisa produzir.</p></div></div>
+        <section class="painel">
+          <h2>Etapas</h2><p>A ordem e os responsáveis são definidos em cada lote.</p>
+          <form id="form-etapa" class="form-linha">
+            <label>Nome da etapa <input name="name" required maxlength="80" placeholder="Ex.: Bordado"></label>
+            <label>Setor <input name="sector" required maxlength="80" placeholder="Ex.: Acabamento"></label>
+            <button type="submit">Adicionar etapa</button>
+          </form>
+          <div id="lista-etapas" class="lista"></div>
+        </section>
+        <section class="painel">
+          <h2>Produtos</h2><p>O valor cadastrado será sugerido ao criar o lote.</p>
+          <form id="form-produto" class="form-linha">
+            <label>Nome do produto <input name="name" required maxlength="100"></label>
+            <label>Valor por peça (R$) <input name="price" required type="number" min="0" max="100000" step="0.01"></label>
+            <button type="submit">Adicionar produto</button>
+          </form>
+          <div id="lista-produtos" class="lista"></div>
+        </section>
+      </section>
+
+      <!-- Totais calculados com as peças úteis após as perdas. -->
+      <section id="tela-resultados" hidden>
+        <div class="titulo-pagina"><div><h1>Resultados</h1><p>Produção, perdas, observações e valores previstos.</p></div></div>
+        <div class="indicadores">
+          <div><small>Total confeccionado</small><strong id="total-confeccionado">0</strong></div>
+          <div><small>Total de perdas</small><strong id="total-perdas">0</strong></div>
+          <div><small>Valor dos lotes concluídos</small><strong id="valor-concluido">R$ 0,00</strong></div>
+          <div><small>Total previsto após perdas</small><strong id="valor-previsto">R$ 0,00</strong></div>
+        </div>
+        <p class="texto-suave">Valores por peça útil. Pagamentos e baixas financeiras não são registrados aqui.</p>
+        <div class="tabela">
+          <table><thead><tr><th>Lote</th><th>Produto</th><th>Confeccionado</th><th>Perdas</th><th>Valor previsto</th></tr></thead><tbody id="tabela-resultados"></tbody></table>
+        </div>
+        <h2>Perdas e observações</h2>
+        <div id="observacoes-resultados" class="grade-observacoes"></div>
+        <p id="sem-observacoes" class="texto-suave" hidden>Nenhuma ocorrência registrada.</p>
+      </section>
+    </main>
+  </div>
+
+  <!-- Modal visualizar lote. -->
+  <dialog id="modal-lote" aria-labelledby="titulo-detalhe">
+    <div class="topo-modal"><h2 id="titulo-detalhe">Detalhes do lote</h2><button type="button" class="fechar secundario" aria-label="Fechar">×</button></div>
+    <p id="descricao-detalhe" class="texto-suave"></p>
+    <div class="indicadores resumo-lote">
+      <div><small>Inicial</small><strong id="quantidade-detalhe"></strong></div>
+      <div><small>Perdas</small><strong id="perdas-detalhe"></strong></div>
+      <div><small>Entrega</small><strong id="entrega-detalhe"></strong></div>
+    </div>
+    <h3>Caminho do lote</h3><p class="texto-suave">Você pode acompanhar todas as etapas. Só pode executar a sua quando ela estiver disponível.</p>
+    <div id="etapas-detalhe"></div>
+    <div class="valor-lote"><span>Valor por peça</span><strong id="preco-peca-detalhe"></strong></div>
+    <div id="financeiro-detalhe" class="valor-lote" hidden><span>Valor previsto após perdas</span><strong id="valor-detalhe"></strong></div>
+    <p id="notas-detalhe" class="texto-suave" hidden></p>
+    <h3 id="titulo-ocorrencias" hidden>Ocorrências</h3><div id="ocorrencias-detalhe"></div>
+  </dialog>
+
+  <!-- Modal cadastro de funcionário. -->
+  <dialog id="modal-funcionario" aria-labelledby="titulo-funcionario">
+    <div class="topo-modal"><h2 id="titulo-funcionario">Novo funcionário</h2><button type="button" class="fechar secundario" aria-label="Fechar">×</button></div>
+    <p>Informe a função e crie o acesso.</p>
+    <form id="form-funcionario">
+      <label>Nome <input name="name" required maxlength="80"></label>
+      <label>Função <input name="specialty" required maxlength="80"></label>
+      <label>Login <input name="username" required minlength="3" maxlength="40" autocomplete="off"></label>
+      <label>Senha inicial <input name="password" type="password" required minlength="8" maxlength="128" autocomplete="new-password"></label>
+      <button type="submit">Criar acesso</button>
+    </form>
+  </dialog>
+
+  <!-- Modal cadastro de novo lote. -->
+  <dialog id="modal-novo-lote" aria-labelledby="titulo-novo-lote">
+    <div class="topo-modal"><h2 id="titulo-novo-lote">Novo lote</h2><button type="button" class="fechar secundario" aria-label="Fechar">×</button></div>
+    <form id="form-lote">
+      <div class="duas-colunas">
+        <label>Produto <input name="product" list="produtos-cadastrados" required maxlength="120"><datalist id="produtos-cadastrados"></datalist></label>
+        <label>Cliente <input name="client" maxlength="100"></label>
+        <label>Quantidade inicial <input name="quantity" type="number" min="1" max="1000000" step="1" required></label>
+        <label>Valor por peça (R$) <input name="price" type="number" min="0" max="100000" step="0.01" value="0" required></label>
+        <label>Cor <input name="color" maxlength="80"></label>
+        <label>Tamanhos <input name="sizes" maxlength="80"></label>
+        <label>Entrega do lote <input name="due_date" type="date" required></label>
+      </div>
+      <label>Observações <textarea name="notes" rows="2" maxlength="1000"></textarea></label>
+      <h3>Etapas do lote</h3><p class="texto-suave">Escolha a etapa e o responsável. As datas por etapa são opcionais.</p>
+      <div id="etapas-novo-lote"></div>
+      <button id="adicionar-etapa-lote" type="button" class="secundario">+ Adicionar etapa</button>
+      <button type="submit">Criar lote</button>
+    </form>
+  </dialog>
+
+  <!-- Modal editar etapa. -->
+  <dialog id="modal-editar-etapa" aria-labelledby="titulo-editar-etapa">
+    <div class="topo-modal"><h2 id="titulo-editar-etapa">Editar etapa</h2><button type="button" class="fechar secundario" aria-label="Fechar">×</button></div>
+    <form id="form-editar-etapa">
+      <input name="stage_id" type="hidden">
+      <label>Nome da etapa <input name="name" required maxlength="80"></label>
+      <label>Setor <input name="sector" required maxlength="80"></label>
+      <button type="submit">Salvar etapa</button>
+    </form>
+  </dialog>
+
+  <!-- Modal editar senha. -->
+  <dialog id="modal-senha" aria-labelledby="titulo-senha">
+    <div class="topo-modal"><h2 id="titulo-senha">Trocar senha</h2><button type="button" class="fechar secundario" aria-label="Fechar">×</button></div>
+    <form id="form-senha">
+      <input name="member_id" type="hidden">
+      <label>Nova senha <input name="password" type="password" required minlength="8" maxlength="128" autocomplete="new-password"></label>
+      <button type="submit">Salvar senha</button>
+    </form>
+  </dialog>
+
+  <!-- Modal trocar responsável. -->
+  <dialog id="modal-responsavel" aria-labelledby="titulo-responsavel">
+    <div class="topo-modal"><h2 id="titulo-responsavel">Trocar responsável</h2><button type="button" class="fechar secundario" aria-label="Fechar">×</button></div>
+    <form id="form-responsavel">
+      <input name="task_id" type="hidden">
+      <label>Responsável <select name="assignee_id" required></select></label>
+      <button type="submit">Salvar responsável</button>
+    </form>
+  </dialog>
+
+  <!-- Modal finalizar. -->
+  <dialog id="modal-finalizar" aria-labelledby="titulo-finalizar">
+    <div class="topo-modal"><h2 id="titulo-finalizar">Finalizar etapa</h2><button type="button" class="fechar secundario" aria-label="Fechar">×</button></div>
+    <p id="resumo-finalizar"></p>
+    <form id="form-finalizar">
+      <input name="task_id" type="hidden">
+      <label>Houve perda de peças?
+        <select id="houve-perda" name="had_loss" required>
+          <option value="">Selecione uma resposta</option>
+          <option value="nao">Não, todas as peças estão disponíveis</option>
+          <option value="sim">Sim, houve perda</option>
+        </select>
+      </label>
+      <div id="campos-perda" hidden>
+        <label>Quantidade perdida <input name="quantity" type="number" min="1" step="1"></label>
+        <label>Motivo da perda <textarea name="reason" rows="3" maxlength="600"></textarea></label>
+      </div>
+      <p class="texto-suave">Ao confirmar, a quantidade é corrigida e a próxima etapa é liberada.</p>
+      <button type="submit">Confirmar e finalizar</button>
+    </form>
+  </dialog>
+
+  <!-- Modal registrar ocorrência. -->
+  <dialog id="modal-ocorrencia" aria-labelledby="titulo-ocorrencia">
+    <div class="topo-modal"><h2 id="titulo-ocorrencia">Registrar ocorrência</h2><button type="button" class="fechar secundario" aria-label="Fechar">×</button></div>
+    <p>Disponível após concluir, enquanto a próxima etapa não tiver sido iniciada.</p>
+    <form id="form-ocorrencia">
+      <input name="task_id" type="hidden">
+      <label>Quantidade perdida (0 para só observar) <input name="quantity" type="number" min="0" step="1" value="0" required></label>
+      <label>Observação <textarea name="reason" rows="3" maxlength="600" required></textarea></label>
+      <button type="submit">Registrar ocorrência</button>
+    </form>
+  </dialog>
+
+  <!-- Modal exibir avisos. -->
+  <dialog id="modal-avisos" aria-labelledby="titulo-avisos">
+    <div class="topo-modal"><h2 id="titulo-avisos">Seus avisos</h2><button type="button" class="fechar secundario" aria-label="Fechar">×</button></div>
+    <p>Você recebe apenas os avisos destinados a você.</p>
+    <div id="lista-avisos" class="lista"></div><p id="sem-avisos" class="texto-suave" hidden>Nenhum aviso.</p>
+    <button id="ler-avisos" type="button" class="secundario">Marcar como lidos</button>
+  </dialog>
+
+  <div id="mensagem" role="status" aria-live="polite" hidden></div>
+  <noscript>Ative o JavaScript para consultar os dados do Arremate.</noscript>
+
+  <!-- Templates guardam o HTML das partes que se repetem. O JS copia e preenche. -->
+  <template id="modelo-lote">
+    <button type="button" class="cartao-lote">
+      <div class="topo-cartao"><span class="codigo"></span><span class="situacao"></span></div>
+      <h2 class="produto"></h2><p class="cor-tamanhos"></p>
+      <div class="etapa-atual"><small>ETAPA ATUAL</small><strong class="nome-etapa"></strong></div>
+      <progress class="progresso" aria-label="Etapas concluídas"></progress>
+      <div class="rodape-cartao"><span class="quantidade"></span><span class="entrega"></span></div>
+      <p class="sua-vez" hidden>É a sua vez →</p>
+    </button>
+  </template>
+
+  <template id="modelo-funcionario">
+    <div class="linha-equipe"><div><strong class="nome"></strong><small class="funcao-login"></small></div><button type="button" class="acesso secundario"></button><button type="button" class="trocar-senha botao-texto">Trocar senha</button></div>
+  </template>
+
+  <template id="modelo-etapa-cadastro">
+    <div class="linha-lista"><div><strong class="nome"></strong><small class="setor"></small></div><div><button type="button" class="editar botao-texto">Editar</button><button type="button" class="remover botao-texto perigo">Remover</button></div></div>
+  </template>
+
+  <template id="modelo-produto">
+    <div class="linha-lista"><strong class="nome"></strong><span class="valor"></span></div>
+  </template>
+
+  <!-- Modal cadastro de etapas do lote. -->
+  <template id="modelo-etapa-lote">
+    <div class="linha-etapa-lote">
+      <label>Etapa <select name="stage_id" required></select></label>
+      <label>Responsável <select name="assignee_id" required></select></label>
+      <label>Previsão <input name="planned_date" type="date"></label>
+      <div class="acoes-ordem"><button type="button" class="subir secundario" aria-label="Mover etapa para cima">↑</button><button type="button" class="descer secundario" aria-label="Mover etapa para baixo">↓</button><button type="button" class="remover secundario" aria-label="Remover etapa">×</button></div>
+    </div>
+  </template>
+
+  <template id="modelo-etapa-detalhe">
+    <div class="linha-etapa"><span class="numero-etapa"></span><div class="info-etapa"><strong><span class="nome"></span> <span class="sua-etapa" hidden>Sua etapa</span></strong><small class="responsavel-status"></small><small class="quantidades"></small><small class="previsao"></small><small class="inicio" hidden></small><small class="fim" hidden></small></div><div class="acoes-etapa"><button type="button" class="iniciar" hidden>Iniciar</button><button type="button" class="finalizar" hidden>Finalizar</button><button type="button" class="ocorrencia secundario" hidden>Ocorrência</button><button type="button" class="atribuir botao-texto" hidden>Responsável</button></div></div>
+  </template>
+
+  <template id="modelo-resultado">
+    <tr><td><button type="button" class="codigo botao-texto"></button></td><td class="produto"></td><td class="confeccionado"></td><td class="perdas"></td><td class="valor"></td></tr>
+  </template>
+
+  <template id="modelo-observacao">
+    <article class="observacao"><strong class="titulo"></strong><p class="motivo"></p><small class="autor-data"></small></article>
+  </template>
+
+  <template id="modelo-aviso">
+    <div class="linha-lista"><div><strong class="texto"></strong><small class="data"></small></div><button type="button" class="ver-lote secundario">Ver lote</button></div>
+  </template>
+</body>
+</html>
