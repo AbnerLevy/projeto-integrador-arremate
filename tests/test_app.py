@@ -64,7 +64,8 @@ class ArremateTests(unittest.TestCase):
         r=self.command(self.ana,type='complete',task_id=first['id'],had_loss=True,quantity=2,reason='Tecido defeituoso')
         self.assertEqual(r['status'],200,r);current=r['data']['batches'][0]
         self.assertEqual(current['tasks'][1]['incoming'],8);self.assertEqual(current['tasks'][1]['status'],'ready')
-        self.assertEqual(current['price_cents'],450)
+        manager_batch = self.request('/api/state', auth=self.manager)['data']['batches'][0]
+        self.assertEqual(manager_batch['price_cents'], 450)
         self.assertNotIn('client',current);self.assertNotIn('notes',current)
         self.assertNotIn('password_hash',json.dumps(r['data']))
         self.assertNotIn('username',r['data']['members'][0]);self.assertTrue(all(n['user_id']==self.a for n in r['data']['notices']))
