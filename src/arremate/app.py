@@ -1,4 +1,3 @@
-"""Arremate: servidor WSGI sem framework. Execute python app.py --help."""
 import argparse
 import getpass
 import hashlib
@@ -10,8 +9,8 @@ import time
 from http.cookies import SimpleCookie
 from pathlib import Path
 from wsgiref.simple_server import make_server
-from db import Database, ROOT
-from service import Error, require, add_user, password_hash, verify_password, apply, view, uid, now
+from repositories.db import Database, ROOT
+from services.service import Error, require, add_user, password_hash, verify_password, apply, view, uid, now
 
 DB = Database()
 SESSION_AGE = 12 * 60 * 60

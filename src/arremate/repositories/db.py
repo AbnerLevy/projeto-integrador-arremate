@@ -4,7 +4,7 @@ import sqlite3
 from pathlib import Path
 from contextlib import contextmanager
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parent.parent
 
 def load_env():
     path = ROOT / '.env'
