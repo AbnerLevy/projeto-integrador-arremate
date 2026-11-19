@@ -14,7 +14,7 @@ Sistema de gestão voltado para o apoio operacional de microempresas e oficinas 
 
 ## Rodar pela primeira vez
 
-Instale Python 3.11 ou superior. Abra o terminal na pasta `arremate`:
+Instale Python 3.11 ou superior. Abra o terminal na pasta `src/arremate`:
 
 ```powershell
 python app.py init

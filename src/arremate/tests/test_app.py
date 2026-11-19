@@ -3,8 +3,8 @@ import io, json, os, tempfile, unittest, hashlib, time
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 import app
-from db import Database
-from service import add_user, uid
+from repositories.db import Database
+from services.service import add_user, uid
 
 class ArremateTests(unittest.TestCase):
     def setUp(self):
