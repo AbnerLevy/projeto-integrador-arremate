@@ -20,8 +20,8 @@
       <h1>Acesse sua produção</h1>
       <p>Entre com o login e a senha fornecidos pela gerente.</p>
       <form id="form-login">
-        <label>Login <input name="username" required maxlength="40" autocomplete="username"></label>
-        <label>Senha <input name="password" type="password" required maxlength="128" autocomplete="current-password"></label>
+        <label>Login <input name="username" required maxlength="40" autocomplete="username" placeholder="Digite seu login"></label>
+        <label>Senha <input name="password" type="password" required maxlength="128" autocomplete="current-password" placeholder="Digite sua senha"></label>
         <button type="submit">Entrar</button>
       </form>
       <small>Gerente e equipe usam esta mesma tela de acesso.</small>
@@ -31,7 +31,7 @@
   <section id="erro-conexao" class="tela-login" hidden>
     <div class="cartao-login">
       <h1>Não foi possível conectar</h1>
-      <p>Confira se o servidor Python está funcionando.</p>
+      <p>Verifique se o servidor está em execução e se você está conectado à rede correta. Em seguida, tente novamente.</p>
       <button id="tentar-novamente" type="button">Tentar novamente</button>
     </div>
   </section>
@@ -169,8 +169,8 @@
         <label>Cliente <input name="client" maxlength="100"></label>
         <label>Quantidade inicial <input name="quantity" type="number" min="1" max="1000000" step="1" required></label>
         <label>Valor por peça (R$) <input name="price" type="number" min="0" max="100000" step="0.01" value="0" required></label>
-        <label>Cor <input name="color" maxlength="80"></label>
-        <label>Tamanhos <input name="sizes" maxlength="80"></label>
+        <label>Cor <input name="color" maxlength="80" placeholder="Ex.: Azul marinho"></label>
+        <label>Tamanhos <input name="sizes" maxlength="80" placeholder="Ex.: P, M, G, GG"></label>
         <label>Entrega do lote <input name="due_date" type="date" required></label>
       </div>
       <label>Observações <textarea name="notes" rows="2" maxlength="1000"></textarea></label>
