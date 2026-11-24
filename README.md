@@ -75,7 +75,7 @@ Para testar, rode no computador que ficará como servidor:
 python app.py --host 0.0.0.0 --port 8000
 ```
 
-Use `ipconfig` para encontrar o IPv4 do servidor. Em outro aparelho certifique-se de está na mesma rede do servidor, abra por exemplo, `http://192.168.X.XX:8000`, trocando os X.XX pelo IP real do servidor. O servidor precisa ficar ligado. Se necessário, permita a porta 8000 no perfil privado do Firewall do Windows.
+Use `ipconfig` para encontrar o IPv4 do servidor. Em outro aparelho, certifique-se de estar na mesma rede do servidor, abra por exemplo, `http://192.168.X.XX:8000`, trocando os X.XX pelo IP real do servidor. O servidor precisa ficar ligado. Se necessário, permita a porta 8000 no perfil privado do Firewall do Windows.
 
 ## PostgreSQL/Supabase opcional
 
