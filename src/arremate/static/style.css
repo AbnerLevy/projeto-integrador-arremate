@@ -23,6 +23,11 @@ button {
   background: var(--terracota); color: white; font-size: 14px; font-weight: 600; cursor: pointer;
 }
 button:hover { filter: brightness(.95); }
+@media (prefers-reduced-motion: no-preference) {
+  button {
+    transition: filter 0.2s ease, box-shadow 0.2s ease;
+  }
+}
 button:disabled { opacity: .55; cursor: wait; }
 button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
   outline: 3px solid var(--azul); outline-offset: 3px;
