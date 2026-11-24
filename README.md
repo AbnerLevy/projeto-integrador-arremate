@@ -14,14 +14,15 @@ Sistema de gestão voltado para o apoio operacional de microempresas e oficinas 
 
 ## Rodar pela primeira vez
 
-Instale Python 3.11 ou superior. Abra o terminal na pasta `src/arremate`:
+Instale Python 3.11 ou superior. Depois de clonar o repositório e abrir o terminal na raiz do projeto, entre na pasta da aplicação `src/arremate`:
 
 ```powershell
+cd src\arremate
 python app.py init
 python app.py
 ```
 
-O primeiro comando cria as tabelas e pede nome, login e senha da gerente. Ao digitar a senha, ela não aparece no terminal. O segundo inicia o servidor.
+O primeiro comando cria as tabelas e pede nome, login e senha da gerente. Ao digitar a senha, ela não aparece no terminal. O segundo inicia o servidor. Os comandos seguintes desta documentação devem ser executados na mesma pasta `src/arremate`.
 
 Abra **http://localhost:8000**. No Windows, se `python` não funcionar, use `py`. No Linux/macOS, use `python3`.
 
@@ -83,12 +84,12 @@ SQLite é o caminho mais simples para estudar. Para PostgreSQL:
 1. Crie o projeto em https://supabase.com e guarde a senha do banco.
 2. No painel, abra **Connect** e copie a URL do **Session pooler**.
 3. Troque o marcador de senha pela senha real, codificando os caracteres especiais para URL.
-4. Copie `.env.example` para `.env` e instale as dependências opcionais:
+4. Na raiz do repositório, copie `.env.example` para a pasta da aplicação e instale as dependências opcionais:
 
 ```powershell
-Copy-Item .env.example .env
-python -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -r requirements-cloud.txt
+Copy-Item .env.example src\arremate\.env
+python -m venv src\arremate\.venv
+.\src\arremate\.venv\Scripts\python.exe -m pip install -r requirements-cloud.txt
 ```
 
 5. Edite `.env`:
@@ -98,11 +99,14 @@ DATABASE_URL=postgresql://USUARIO:SENHA_CODIFICADA@HOST:5432/postgres?sslmode=re
 COOKIE_SECURE=0
 ```
 
+O arquivo criado fica em `src/arremate/.env`.
+
 Use host, porta e usuário fornecidos pelo painel. O formato acima é apenas um exemplo. Se a URL já tiver `?`, acrescente opções com `&`.
 
 6. Inicialize e rode:
 
 ```powershell
+cd src\arremate
 .\.venv\Scripts\python.exe app.py init
 .\.venv\Scripts\python.exe app.py
 ```
@@ -114,6 +118,12 @@ Trocar SQLite por PostgreSQL não copia os dados automaticamente.
 Para hospedagem HTTPS, configure `COOKIE_SECURE=1`, instale `requirements-cloud.txt` e use `waitress-serve --listen=0.0.0.0:8000 app:application`, ajustando a porta conforme o serviço.
 
 ## Backup, senha e testes
+
+Os comandos desta seção devem ser executados dentro de `src/arremate`. A partir da raiz do repositório, entre na pasta primeiro:
+
+```powershell
+cd src\arremate
+```
 
 Backup SQLite consistente:
 
