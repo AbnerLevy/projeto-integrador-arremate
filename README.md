@@ -11,6 +11,18 @@ Sistema de gestão voltado para o apoio operacional de microempresas e oficinas 
 * **Frontend:** HTML5, CSS3 e JavaScript
 * **Controle de Versão:** Git e GitHub
 
+## 👥 Equipe
+
+- **Abner Levy** — Gestor / Arquiteto de Software / Backend
+- **Anne Grazielle** — Pesquisadora
+- **Bruna Mikaelly** — Desenvolvedora Front-End / Integração
+- **Camilly Felipe** — Modeladora de Banco de Dados
+- **Rauane Luiza** — Analista de Documentação Técnica
+- **Victor Basilio** — Analista de Testes e Requisitos / QA
+- **Luciano Alves** — UX Designer
+- **Willian Hilderio** — DevOps / Controle de Versão e Infraestrutura
+
+<img width="100%" src="https://capsule-render.vercel.app/api?type=rounded&height=3&color=0:0D1117"/>
 
 ## Rodar pela primeira vez
 
