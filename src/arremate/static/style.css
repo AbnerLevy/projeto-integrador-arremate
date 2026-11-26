@@ -47,7 +47,8 @@ small { line-height: 1.5; }
 .botao-texto { color: var(--azul); background: transparent; padding: 8px; }
 .secundario { background: transparent; border-color: var(--borda); color: var(--texto); }
 .remover.secundario { background: transparent; border-color: var(--borda); color: var(--texto); } 
-.remover.secundario:hover { background: #b9260a; color: white; }
+.remover.secundario:hover { background: #ae2509; color: white;}
+
 .perigo { color: var(--terracota); }
 .texto-suave { font-size: 13px; color: var(--suave); }
 .legenda { color: var(--azul); font-size: 10px; font-weight: 700; letter-spacing: 1.8px; margin-bottom: 10px; }
